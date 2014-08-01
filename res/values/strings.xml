@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Flags Quiz</string>
+    <string name="mi_show_answer">Show answer</string>
+    <string name="mi_open_wiki">Open Wiki</string>
+    <string name="mi_settings">Settings</string>
+    <string name="mi_new_game">New Game</string>
+    <string name="score">Player%1$d. Score: %2$d</string>
+    <string name="final_score">Player%1$d. Score: %2$d out of %3$d</string>
+    <string name="flag">Flag</string>
+    <string name="submit">Check</string>
+    <string name="next">Next</string>
+    <string name="capital">Capital</string>
+    <string name="country">Country</string>
+
+    <color name="correct">#00FF00</color>
+    <color name="wrong">#FF0000</color>
+    <color name="not_answered">#000000</color>
+	<string name="ib_subtract">subtract</string>
+	<string name="ib_add">add</string>
+	<string name="number_of_players_title">Number of players</string>
+	<string name="game_over">Game Over</string>
+	<string name="game_over_msg">All flags are shown!\n</string>
+	<string name="new_game">New Game</string>
+	<string name="cancel">Cancel</string>
+	<string name="start_new_game">Start a new game?</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="pref_number_of_flags">Number of flags per game</string>
+    <string name="pref_language">Language</string>
+    <string name="pref_auto_complete_text">Hint</string>
+    <string name="pref_auto_complete_text_summary">Show possible answers when typing</string>
+    <string name="lang_name_en">English</string>
+    <string name="lang_name_ru">Russian</string>
+    <string name="lang_en">EN</string>
+    <string name="lang_ru">RU</string>
+    <string name="lang_default">EN</string>
+    <string-array name="pref_languages_entries">
+        <item >@string/lang_name_en</item>
+        <item >@string/lang_name_ru</item>
+    </string-array>
+    
+    <string-array name="pref_languages_values">
+        <item >@string/lang_en</item>
+        <item >@string/lang_ru</item>
+    </string-array>
+    
+    <string name="pref_game_mode_text">Game Mode</string>
+    <string name="game_mode1">Without hints</string>
+    <string name="game_mode2">Show possible answers when typing</string>
+    <string name="game_mode3">Show options</string>
+    <string-array name="pref_game_mode_entries">
+        <item >@string/game_mode1</item>
+        <item >@string/game_mode2</item>
+        <item >@string/game_mode3</item>
+    </string-array>
+    
+    <string-array name="pref_game_mode_values">
+        <item >1</item>
+        <item >2</item>
+        <item >3</item>
+    </string-array>
+    
+    <string name="ab_subtitle_flag_position">Flag %1$d/%2$d</string>
+</resources>
