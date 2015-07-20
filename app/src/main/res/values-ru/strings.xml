@@ -12,7 +12,7 @@
 	<string name="number_of_players_title">Число игроков</string>
     <string name="flag">Флаг</string>
     <string name="submit">Проверить</string>
-    <string name="next">Следующий</string>
+    <string name="next">Дальше</string>
     <string name="capital">Столица</string>
     <string name="country">Страна</string>
 	<string name="game_over">Игра окончена</string>

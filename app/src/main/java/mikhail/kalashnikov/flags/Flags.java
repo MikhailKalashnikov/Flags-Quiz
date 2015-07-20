@@ -249,8 +249,8 @@ public class Flags {
 				}
 			}
 		}
-		Log.d(TAG, "mCorrectAnswerPos="+mCorrectAnswerPos);
-		Log.d(TAG, "options="+ Arrays.toString(mAnswerOptions));
+		if (LogGuard.isDebug) Log.d(TAG, "mCorrectAnswerPos="+mCorrectAnswerPos);
+		if (LogGuard.isDebug) Log.d(TAG, "options="+ Arrays.toString(mAnswerOptions));
 		return mAnswerOptions;
 	}
 	

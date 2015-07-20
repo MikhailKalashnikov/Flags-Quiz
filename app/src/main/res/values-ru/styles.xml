@@ -1,0 +1,9 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<style name="TextStyle">
+	    <item name="android:textColor">@color/text_color</item>
+	    <item name="android:textSize">18sp</item>
+	    <item name="android:textStyle">bold</item>
+	</style>
+	
+</resources>

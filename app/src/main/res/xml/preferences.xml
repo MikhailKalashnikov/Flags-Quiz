@@ -14,7 +14,7 @@
         android:dialogTitle="@string/pref_game_mode_text"
         android:entries="@array/pref_game_mode_entries"
         android:entryValues="@array/pref_game_mode_values"
-        android:defaultValue="1"
+        android:defaultValue="3"
         />
     
     <mikhail.kalashnikov.flags.NumberPickerPreference 

@@ -16,9 +16,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
         }
     }
+
+    productFlavors {
+        mototest {
+            applicationId "mikhail.kalashnikov.flags.mototest"
+            versionName "mototest"
+        }
+        full {
+            applicationId "mikhail.kalashnikov.flags"
+        }
+    }
 }
 
 dependencies {
     compile 'com.android.support:appcompat-v7:19.1.0'
-    compile files('libs/android-support-v13.jar')
+    compile 'com.android.support:support-v13:19.1.0'
+    //compile files('libs/android-support-v13.jar')
 }

@@ -44,13 +44,15 @@ public class SettingsActivity extends PreferenceActivity
 	
 	public static GameMode prefToGameMode(String str){
 		if(str==null){
+			return GameMode.GAME_MODE_OPTIONS;
+		}else if(str.equals("1")){
 			return GameMode.GAME_MODE_NORMAL;
 		}else if(str.equals("2")){
 			return GameMode.GAME_MODE_AUTOCOMPLETE_TEXT;
 		}else if(str.equals("3")){
 			return GameMode.GAME_MODE_OPTIONS;
 		}else {
-			return GameMode.GAME_MODE_NORMAL;
+			return GameMode.GAME_MODE_OPTIONS;
 		}
 	}
 	
@@ -63,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity
 		case GAME_MODE_OPTIONS:
 			return "3";
 		default:
-			return "1";
+			return "3";
 		}
 	}
 	

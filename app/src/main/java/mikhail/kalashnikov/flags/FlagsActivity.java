@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
@@ -54,20 +55,29 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 	private int mColorNotAnswered;
 	private int mColorCorrect;
 	private int mColorWrong;
-	
+	private boolean DEVELOPER_MODE = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		if(DEVELOPER_MODE){
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.detectAll()
+					.penaltyLog()
+					.build();
+			StrictMode.setThreadPolicy(policy);
+
+		}
 		Log.d(TAG, "OnCreate");
 		super.onCreate(savedInstanceState);
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		
+		//PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
 		if (getSupportFragmentManager().findFragmentByTag(MODEL) == null){
 			mModel = new ModelFragment();
 			getSupportFragmentManager().beginTransaction().add(mModel, MODEL).commit();
 		}else{
 			mModel = (ModelFragment) getSupportFragmentManager().findFragmentByTag(MODEL);
 		}
-		
+
 		setContentView(R.layout.main);
 		mFlagImage = (ImageView) findViewById(R.id.flag);
 		mScoreTextView = (TextView) findViewById(R.id.score);
@@ -80,7 +90,7 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 				submit();
 			}
 		});
-		
+
 		mNextButton = (Button) findViewById(R.id.next);
 		mNextButton.setEnabled(false);
 		mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -90,13 +100,13 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 			}
 		});
 		mActionBar = getSupportActionBar();
-		
+
 		mRGOptions = (RadioGroup) findViewById(R.id.radio_group_answers);
 		mAnswerOptionRBs[0] = (RadioButton) findViewById(R.id.rb_answer1);
 		mAnswerOptionRBs[1] = (RadioButton) findViewById(R.id.rb_answer2);
 		mAnswerOptionRBs[2] = (RadioButton) findViewById(R.id.rb_answer3);
 		mAnswerOptionRBs[3] = (RadioButton) findViewById(R.id.rb_answer4);
-		
+
 		mColorNotAnswered = getResources().getColor(R.color.not_answered);
 		mColorCorrect = getResources().getColor(R.color.correct);
 		mColorWrong = getResources().getColor(R.color.wrong);
@@ -112,7 +122,7 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 		this.mFlags = flags;
 		mPref = pref;
 		switchGameMode(mPref.getString(SettingsActivity.KEY_PREF_GAME_MODE, ""));
-		
+
 		findViewById(R.id.progressBar1).setVisibility(View.GONE);
 		mFlagImage.setVisibility(View.VISIBLE);
 		mSubmitButton.setEnabled(true);
@@ -124,157 +134,157 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 			showNextFlag(true);
 			mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.getScore()));
 		}
-		
+
 		if(mModel != null && mModel.isAnswerShown()){
 			showAnswer();
 		}
 	}
-	
+
 	public void onLanguageChanged(){
 		if(mGameMode == GameMode.GAME_MODE_AUTOCOMPLETE_TEXT){
-			ArrayAdapter<String> country_adapter = new ArrayAdapter<String>(this, 
+			ArrayAdapter<String> country_adapter = new ArrayAdapter<String>(this,
 					R.layout.auto_text_item, mFlags.getCountryList());
 			((AutoCompleteTextView) mCountryEditText).setAdapter(country_adapter);
-			ArrayAdapter<String> capital_adapter = new ArrayAdapter<String>(this, 
+			ArrayAdapter<String> capital_adapter = new ArrayAdapter<String>(this,
 					R.layout.auto_text_item, mFlags.getCapitalList());
 			((AutoCompleteTextView) mCapitalEditText).setAdapter(capital_adapter);
 		}
 	}
-	
+
 	public void switchGameMode(String gameModeStr){
 		mGameMode = SettingsActivity.prefToGameMode(gameModeStr);
 		Log.d(TAG, "switchGameMode " + mGameMode);
 		switch (mGameMode) {
-		case GAME_MODE_NORMAL:
-			mCountryEditText = (EditText) findViewById(R.id.country);
-			mCapitalEditText = (EditText) findViewById(R.id.capital);
-			findViewById(R.id.country_auto_complete).setVisibility(View.GONE);
-			findViewById(R.id.capital_auto_complete).setVisibility(View.GONE);
-			mRGOptions.setVisibility(View.GONE);
-			findViewById(R.id.country).setVisibility(View.VISIBLE);
-			findViewById(R.id.capital).setVisibility(View.VISIBLE);
-			mCountryEditText.requestFocus();
-			mCountryEditText.setOnEditorActionListener(this);
-			mCapitalEditText.setOnEditorActionListener(this);
-			
-			break;
+			case GAME_MODE_NORMAL:
+				mCountryEditText = (EditText) findViewById(R.id.country);
+				mCapitalEditText = (EditText) findViewById(R.id.capital);
+				findViewById(R.id.country_auto_complete).setVisibility(View.GONE);
+				findViewById(R.id.capital_auto_complete).setVisibility(View.GONE);
+				mRGOptions.setVisibility(View.GONE);
+				findViewById(R.id.country).setVisibility(View.VISIBLE);
+				findViewById(R.id.capital).setVisibility(View.VISIBLE);
+				mCountryEditText.requestFocus();
+				mCountryEditText.setOnEditorActionListener(this);
+				mCapitalEditText.setOnEditorActionListener(this);
+				mSubmitButton.setText(getResources().getString(R.string.submit));
+				break;
 
-		case GAME_MODE_AUTOCOMPLETE_TEXT:
-			mCountryEditText = (EditText) findViewById(R.id.country_auto_complete);
-			mCapitalEditText = (EditText) findViewById(R.id.capital_auto_complete);
-			findViewById(R.id.country).setVisibility(View.GONE);
-			findViewById(R.id.capital).setVisibility(View.GONE);
-			mRGOptions.setVisibility(View.GONE);
-			findViewById(R.id.country_auto_complete).setVisibility(View.VISIBLE);
-			findViewById(R.id.capital_auto_complete).setVisibility(View.VISIBLE);
-			
-			onLanguageChanged();
-			mCountryEditText.requestFocus();
-			mCountryEditText.setOnEditorActionListener(this);
-			mCapitalEditText.setOnEditorActionListener(this);
-			
-			break;
-		case GAME_MODE_OPTIONS:
-			mRGOptions.setVisibility(View.VISIBLE);
-			findViewById(R.id.country_auto_complete).setVisibility(View.GONE);
-			findViewById(R.id.capital_auto_complete).setVisibility(View.GONE);
-			findViewById(R.id.country).setVisibility(View.GONE);
-			findViewById(R.id.capital).setVisibility(View.GONE);
-			setAnswerOptions(mModel.getCurrentAnswerType(), false);
-			
-			break;
+			case GAME_MODE_AUTOCOMPLETE_TEXT:
+				mCountryEditText = (EditText) findViewById(R.id.country_auto_complete);
+				mCapitalEditText = (EditText) findViewById(R.id.capital_auto_complete);
+				findViewById(R.id.country).setVisibility(View.GONE);
+				findViewById(R.id.capital).setVisibility(View.GONE);
+				mRGOptions.setVisibility(View.GONE);
+				findViewById(R.id.country_auto_complete).setVisibility(View.VISIBLE);
+				findViewById(R.id.capital_auto_complete).setVisibility(View.VISIBLE);
+
+				onLanguageChanged();
+				mCountryEditText.requestFocus();
+				mCountryEditText.setOnEditorActionListener(this);
+				mCapitalEditText.setOnEditorActionListener(this);
+				mSubmitButton.setText(getResources().getString(R.string.submit));
+				break;
+			case GAME_MODE_OPTIONS:
+				mRGOptions.setVisibility(View.VISIBLE);
+				findViewById(R.id.country_auto_complete).setVisibility(View.GONE);
+				findViewById(R.id.capital_auto_complete).setVisibility(View.GONE);
+				findViewById(R.id.country).setVisibility(View.GONE);
+				findViewById(R.id.capital).setVisibility(View.GONE);
+				setAnswerOptions(mModel.getCurrentAnswerType(), false);
+
+				break;
 		}
 	}
-	
+
 	private int getFlagID(String flag){
 		return getResources().getIdentifier(
 				getPackageName()+":drawable/" + flag, null, null);
 	}
-	
+
 	public void submit(){
 		int score = 0;
-		
-		switch (mGameMode) {
-		case GAME_MODE_NORMAL:
-		case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
-			int result = mFlags.checkAnswer(mCountryEditText.getText().toString(), 
-					mCapitalEditText.getText().toString());		
-	
-			switch (result) {
-			case Flags.ANSWER_BOTH_CORRECT:
-				mCountryEditText.setTextColor(mColorCorrect);
-				mCapitalEditText.setTextColor(mColorCorrect);
-				score = 2;
-				mSubmitButton.setEnabled(false);
-				break;
-	
-			case Flags.ANSWER_CAPITAL_CORRECT:
-				mCountryEditText.setTextColor(mColorWrong);
-				mCapitalEditText.setTextColor(mColorCorrect);
-				score = 1;
-				break;
-			
-			case Flags.ANSWER_COUNTRY_CORRECT:
-				mCapitalEditText.setTextColor(mColorWrong);
-				mCountryEditText.setTextColor(mColorCorrect);
-				score = 1;
-				break;
-			default:
-				mCapitalEditText.setTextColor(mColorWrong);
-				mCountryEditText.setTextColor(mColorWrong);
-				score = 0;
-				break;
-			}
-			mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.addScore(score)));
-			
-			break;
 
-		case GAME_MODE_OPTIONS:
-			int pos=-1;
-			for(int i = 0; i< mAnswerOptionRBs.length; i++){
-				mAnswerOptionRBs[i].setTextColor(mColorNotAnswered);
-				if(mAnswerOptionRBs[i].getId() == mRGOptions.getCheckedRadioButtonId()){
-					pos = i;
+		switch (mGameMode) {
+			case GAME_MODE_NORMAL:
+			case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
+				int result = mFlags.checkAnswer(mCountryEditText.getText().toString(),
+						mCapitalEditText.getText().toString());
+
+				switch (result) {
+					case Flags.ANSWER_BOTH_CORRECT:
+						mCountryEditText.setTextColor(mColorCorrect);
+						mCapitalEditText.setTextColor(mColorCorrect);
+						score = 2;
+						mSubmitButton.setEnabled(false);
+						break;
+
+					case Flags.ANSWER_CAPITAL_CORRECT:
+						mCountryEditText.setTextColor(mColorWrong);
+						mCapitalEditText.setTextColor(mColorCorrect);
+						score = 1;
+						break;
+
+					case Flags.ANSWER_COUNTRY_CORRECT:
+						mCapitalEditText.setTextColor(mColorWrong);
+						mCountryEditText.setTextColor(mColorCorrect);
+						score = 1;
+						break;
+					default:
+						mCapitalEditText.setTextColor(mColorWrong);
+						mCountryEditText.setTextColor(mColorWrong);
+						score = 0;
+						break;
 				}
-			}
-			if(mFlags.getCorrectAnswerPos() == pos){
-				score = 1;
-				mSubmitButton.setEnabled(false);
-				mAnswerOptionRBs[pos].setTextColor(mColorCorrect);
-				mModel.setAnswerShown();
-			}else{
-				score = 0;
-				mAnswerOptionRBs[pos].setTextColor(mColorWrong);
-				if(ONE_ATTEMPT_IN_OPTION_MODE){
-					showAnswer();
+				mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.addScore(score)));
+
+				break;
+
+			case GAME_MODE_OPTIONS:
+				int pos=-1;
+				for(int i = 0; i< mAnswerOptionRBs.length; i++){
+					mAnswerOptionRBs[i].setTextColor(mColorNotAnswered);
+					if(mAnswerOptionRBs[i].getId() == mRGOptions.getCheckedRadioButtonId()){
+						pos = i;
+					}
 				}
-			}
-			mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.addScoreOptionGameMode(score)));
-			break;
+				if(mFlags.getCorrectAnswerPos() == pos){
+					score = 1;
+					mSubmitButton.setEnabled(false);
+					mAnswerOptionRBs[pos].setTextColor(mColorCorrect);
+					mModel.setAnswerShown();
+				}else{
+					score = 0;
+					mAnswerOptionRBs[pos].setTextColor(mColorWrong);
+					if(ONE_ATTEMPT_IN_OPTION_MODE){
+						showAnswer();
+					}
+				}
+				mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.addScoreOptionGameMode(score)));
+				break;
 		}
-		
-		
+
+
 	}
-	
+
 	private void resetFields(){
 		switch (mGameMode) {
-		case GAME_MODE_NORMAL:
-		case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
-			mCountryEditText.setText("");
-			mCountryEditText.setTextColor(mColorNotAnswered);
-			mCapitalEditText.setText("");
-			mCapitalEditText.setTextColor(mColorNotAnswered);
-			
-			break;
-		case GAME_MODE_OPTIONS:
-			for(RadioButton rb: mAnswerOptionRBs){
-				rb.setTextColor(mColorNotAnswered);
-			}
-			mAnswerOptionRBs[0].setChecked(true);
-			break;
+			case GAME_MODE_NORMAL:
+			case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
+				mCountryEditText.setText("");
+				mCountryEditText.setTextColor(mColorNotAnswered);
+				mCapitalEditText.setText("");
+				mCapitalEditText.setTextColor(mColorNotAnswered);
+
+				break;
+			case GAME_MODE_OPTIONS:
+				for(RadioButton rb: mAnswerOptionRBs){
+					rb.setTextColor(mColorNotAnswered);
+				}
+				mAnswerOptionRBs[0].setChecked(true);
+				break;
 		}
 		mSubmitButton.setEnabled(true);
-			
+
 	}
 	private void next(){
 		Log.d(TAG, "next");
@@ -286,53 +296,53 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 			mModel.nextTurn();
 			boolean nextFlagAvailable = showNextFlag(false);
 			mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.getScore()));
-			if(nextFlagAvailable){
+			if(mGameMode == GameMode.GAME_MODE_OPTIONS && nextFlagAvailable){
 				setAnswerOptions(Flags.AnswerType.COUNTRY, true);
 			}
 		}
 	}
-	
+
 	private void setAnswerOptions(Flags.AnswerType answerType, boolean isRequestNew){
 		Log.d(TAG, "setAnswerOptions " + answerType);
 		String[] answers = mModel.getAnswerOptions(NUM_OF_OPTIONS, answerType, isRequestNew);
 		for(int i=0; i< NUM_OF_OPTIONS; i++){
 			mAnswerOptionRBs[i].setText(answers[i]);
 			mAnswerOptionRBs[i].postInvalidate();
-		} 
+		}
 		mAnswerOptionRBs[0].setChecked(true);
-		
+
 		if(answerType == AnswerType.COUNTRY){
 			mSubmitButton.setText(getResources().getString(R.string.country));
 		}else{
 			mSubmitButton.setText(getResources().getString(R.string.capital));
 		}
 	}
-	
+
 	private void showAnswer(){
 		switch (mGameMode) {
-		case GAME_MODE_NORMAL:
-		case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
-			mFlags.getCountry();
-			mCountryEditText.setText(mFlags.getCountry());
-			mCountryEditText.setTextColor(mColorNotAnswered);
-			mCapitalEditText.setText(mFlags.getCapital());
-			mCapitalEditText.setTextColor(mColorNotAnswered);
-			
-			break;
-		case GAME_MODE_OPTIONS:
-			if(!ONE_ATTEMPT_IN_OPTION_MODE){
-				for(RadioButton rb: mAnswerOptionRBs){
-					rb.setTextColor(mColorNotAnswered);
+			case GAME_MODE_NORMAL:
+			case GAME_MODE_AUTOCOMPLETE_TEXT: // for both these modes the same handling
+				mFlags.getCountry();
+				mCountryEditText.setText(mFlags.getCountry());
+				mCountryEditText.setTextColor(mColorNotAnswered);
+				mCapitalEditText.setText(mFlags.getCapital());
+				mCapitalEditText.setTextColor(mColorNotAnswered);
+
+				break;
+			case GAME_MODE_OPTIONS:
+				if(!ONE_ATTEMPT_IN_OPTION_MODE){
+					for(RadioButton rb: mAnswerOptionRBs){
+						rb.setTextColor(mColorNotAnswered);
+					}
 				}
-			}
-			mAnswerOptionRBs[mFlags.getCorrectAnswerPos()].setChecked(true);
-			mAnswerOptionRBs[mFlags.getCorrectAnswerPos()].setTextColor(mColorCorrect);
-			break;
+				mAnswerOptionRBs[mFlags.getCorrectAnswerPos()].setChecked(true);
+				mAnswerOptionRBs[mFlags.getCorrectAnswerPos()].setTextColor(mColorCorrect);
+				break;
 		}
 		mModel.setAnswerShown();
 		mSubmitButton.setEnabled(false);
 	}
-	
+
 	private boolean showNextFlag(boolean isShowCurrent){
 		String flagSrc;
 		if(isShowCurrent){
@@ -347,34 +357,34 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 		}else{// No more flags. end the game
 			mSubmitButton.setEnabled(false);
 			mNextButton.setEnabled(false);
-			
+
 			DialogFragment gameOverDialog = new DialogFragment(){
 				@Override
 				public Dialog onCreateDialog(Bundle savedInstanceState) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 					builder.setTitle(R.string.game_over)
-						//.setMessage(getResources().getString(R.string.game_over_msg) + getFinalScore())
-						.setMessage(getFinalScore())
-						.setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								NumberPickerDialog dialogNumPicker = new NumberPickerDialog();
-								dialogNumPicker.show(getSupportFragmentManager(), "NumberOfPlayersPicker");
-								
-							}
-						})
-						.setNegativeButton(R.string.cancel, null);
+							//.setMessage(getResources().getString(R.string.game_over_msg) + getFinalScore())
+							.setMessage(getFinalScore())
+							.setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									NumberPickerDialog dialogNumPicker = new NumberPickerDialog();
+									dialogNumPicker.show(getSupportFragmentManager(), "NumberOfPlayersPicker");
+
+								}
+							})
+							.setNegativeButton(R.string.cancel, null);
 					return builder.create();
 				}
 			};
-			 
+
 			gameOverDialog.show(getSupportFragmentManager(), "GameOverDialog");
 			return false;
 		}
-		
+
 	}
-	
+
 	private String getFinalScore() {
 		int[] finalScore = mModel.getFinalScore();
 		StringBuilder sb = new StringBuilder();
@@ -382,7 +392,7 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 			sb.append(String.format(getResources().getString(R.string.final_score), (i+1), finalScore[i], mModel.getMaxScore()));
 			sb.append("\n");
 		}
-		
+
 		return sb.toString();
 	}
 
@@ -392,47 +402,49 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 		mScoreTextView.setText(String.format(getResources().getString(R.string.score), getCurrentPlayerNumber(), mModel.getScore()));
 		resetFields();
 		showNextFlag(true);
-		setAnswerOptions(AnswerType.COUNTRY, true);
+		if(mGameMode == GameMode.GAME_MODE_OPTIONS){
+			setAnswerOptions(AnswerType.COUNTRY, true);
+		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
-		case R.id.mi_show_answer:
-			showAnswer();
-			break;
-		case R.id.mi_open_wiki:
-			showAnswer();
-			
-			Intent intent = new Intent(this, AnswerActivity.class);
-			intent.putExtra(AnswerActivity.URL, mFlags.getUrl());
-			intent.putExtra(AnswerActivity.NAME, mFlags.getCountry() + ", " + mFlags.getCapital());
-			startActivity(intent);
-			break;
-		case R.id.mi_new_game:
-			DialogFragment newGameDialog = new DialogFragment(){
-				@Override
-				public Dialog onCreateDialog(Bundle savedInstanceState) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-					builder.setMessage(R.string.start_new_game)
-						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								NumberPickerDialog dialogNumPicker = new NumberPickerDialog();
-								dialogNumPicker.show(getSupportFragmentManager(), "NumberOfPlayersPicker");
-							}
-						})
-						.setNegativeButton(R.string.no, null);
-					return builder.create();
-				}
-			};
-			 
-			newGameDialog.show(getSupportFragmentManager(), "StartGameDialog");
-			break;
-		case R.id.mi_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
-			break;
+			case R.id.mi_show_answer:
+				showAnswer();
+				break;
+			case R.id.mi_open_wiki:
+				showAnswer();
+
+				Intent intent = new Intent(this, AnswerActivity.class);
+				intent.putExtra(AnswerActivity.URL, mFlags.getUrl());
+				intent.putExtra(AnswerActivity.NAME, mFlags.getCountry() + ", " + mFlags.getCapital());
+				startActivity(intent);
+				break;
+			case R.id.mi_new_game:
+				DialogFragment newGameDialog = new DialogFragment(){
+					@Override
+					public Dialog onCreateDialog(Bundle savedInstanceState) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setMessage(R.string.start_new_game)
+								.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										NumberPickerDialog dialogNumPicker = new NumberPickerDialog();
+										dialogNumPicker.show(getSupportFragmentManager(), "NumberOfPlayersPicker");
+									}
+								})
+								.setNegativeButton(R.string.no, null);
+						return builder.create();
+					}
+				};
+
+				newGameDialog.show(getSupportFragmentManager(), "StartGameDialog");
+				break;
+			case R.id.mi_settings:
+				startActivity(new Intent(this, SettingsActivity.class));
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -440,17 +452,17 @@ public class FlagsActivity extends ActionBarActivity implements OnEditorActionLi
 	@Override
 	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		if((v.getId() == R.id.capital || v.getId() == R.id.country
-				|| v.getId() == R.id.capital_auto_complete || v.getId() == R.id.country_auto_complete) 
+				|| v.getId() == R.id.capital_auto_complete || v.getId() == R.id.country_auto_complete)
 				&& (event == null || event.getAction() == KeyEvent.ACTION_UP)){
 			InputMethodManager imm= (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0); 
+			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 			if(v.getId() == R.id.country || v.getId() == R.id.country_auto_complete){
 				mCapitalEditText.requestFocus();
 			}
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void onPause() {
 		if(mPref != null){
